@@ -1,4 +1,4 @@
-const N8N_WEBHOOK_URL = 'process.env.N8N_WEBHOOK_URL';
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/api-log';
 
 function webhookLogger(req, res, next) {
   const start = Date.now();

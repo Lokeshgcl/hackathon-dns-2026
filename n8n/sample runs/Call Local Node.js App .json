@@ -1,0 +1,167 @@
+{
+  "name": "Call Local Node.js App",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "75d82835-4361-474a-8343-f036b7716a99",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "***/test",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-id",
+              "value": "***"
+            },
+            {
+              "name": "x-api-key",
+              "value": "***"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5c03c370-5a51-45bb-9a59-3413d3d215d7",
+      "name": "Call Local API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    statusCode: $input.first().json.statusCode || 'N/A',\n    headers: $input.first().json.headers || {},\n    body: $input.first().json.body || $input.first().json || {},\n    message: 'Request successful'\n  }\n}];"
+      },
+      "id": "37b1cef7-a000-4bd0-a8dd-7e7c471a1e2c",
+      "name": "Debug Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const error = $input.first().json.error || $input.first().json;\nreturn [{\n  json: {\n    error: true,\n    message: error.message || JSON.stringify(error),\n    details: error\n  }\n}];"
+      },
+      "id": "a81534e8-8fa9-4b55-b62a-12ba814da0a2",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "api-log",
+        "options": {}
+      },
+      "id": "9a54cf31-822e-4f04-9432-f4269879315e",
+      "name": "Webhook - API Log",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        256
+      ],
+      "webhookId": "a417e5e8-0cca-4bb6-a972-03d1a95a9463"
+    }
+  ],
+  "pinData": {
+    "Webhook - API Log": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json"
+          },
+          "query": {},
+          "body": {
+            "method": "GET",
+            "path": "/test",
+            "status": 200,
+            "ip": "127.0.0.1",
+            "apiId": "hackathon-dns",
+            "duration": 10,
+            "timestamp": "2026-11-15T10:30:00Z"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Local API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Local API": {
+      "main": [
+        [
+          {
+            "node": "Debug Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - API Log": {
+      "main": [
+        [
+          {
+            "node": "Call Local API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "6412f312-3d2a-4d07-9e49-f1edd0ceb60c",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": ""
+  },
+  "nodeGroups": [],
+  "id": "9S7nMuywG6OK6aYA",
+  "tags": []
+}
